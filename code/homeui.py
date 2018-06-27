@@ -1,12 +1,12 @@
 import tkinter as tk
 from tkinter import ttk
-import updateui_subject as updatesub
-import updateui_staff as updatestaff
-import updateui_invigilator as updateinv
-import updateui_examhall as updateexamhall
-import updateui_exam as updateexam
-import updateui_class as updateclass
-import updateui_examinstance as updateexaminstance
+import ui_subject as uisub
+import ui_staff as uistaff
+import ui_invigilator as uiinv
+import ui_examhall as uiexamhall
+import ui_exam as uiexam
+import ui_class as uiclass
+import ui_examinstance as uiexaminstance
 import uiabstract
 
 
@@ -58,19 +58,19 @@ class HomeUI(uiabstract.ParentUI):
 
     def btn_handler(self, key):
         if key == self.BTNSUBKEY:
-            self.update_UI = updatesub.DisplayUpdateSubjectUI()
+            self.update_UI = uisub.DisplayUpdateSubjectUI()
         elif key == self.BTNEXAMINSTANCEKEY:
-            self.update_UI = updateexaminstance.DisplayUpdateExaminstanceUI()
+            self.update_UI = uiexaminstance.DisplayUpdateExaminstanceUI()
         elif key == self.BTNCLASSKEY:
-            self.update_UI = updateclass.DisplayUpdateClassUI()
+            self.update_UI = uiclass.DisplayUpdateClassUI()
         elif key == self.BTNEXAMKEY:
-            self.update_UI = updateexam.DisplayUpdateExamUI()
+            self.update_UI = uiexam.DisplayUpdateExamUI()
         elif key == self.BTNEXAMHALLKEY:
-            self.update_UI = updateexamhall.DisplayUpdateExamhallUI()
+            self.update_UI = uiexamhall.DisplayUpdateExamhallUI()
         elif key == self.BTNINVIGILATORKEY:
-            self.update_UI = updateinv.DisplayUpdateInvigilatorUI()
+            self.update_UI = uiinv.DisplayUpdateInvigilatorUI()
         elif key == self.BTNSTAFFKEY:
-            self.update_UI = updatestaff.DisplayUpdateStaffUI()
+            self.update_UI = uistaff.DisplayUpdateStaffUI()
 
 
 
