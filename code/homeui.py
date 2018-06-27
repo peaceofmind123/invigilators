@@ -1,41 +1,77 @@
 import tkinter as tk
 from tkinter import ttk
-import updateui_select
+import updateui_subject as updatesub
+import updateui_staff as updatestaff
+import updateui_invigilator as updateinv
+import updateui_examhall as updateexamhall
+import updateui_exam as updateexam
+import updateui_class as updateclass
+import updateui_examinstance as updateexaminstance
+import uiabstract
 
 
-class HomeUI(tk.Tk):
+class HomeUI(uiabstract.ParentUI):
     def __init__(self, *args, **kwargs):
-        tk.Tk.__init__(self, *args, **kwargs)
-
-    def update_db(self,event):
-        # redirect to update ui which is a child window of self
-        self.update_UI_select = updateui_select.UpdateUISelect()
-        self.update_UI_select.wm_title("Update entries")
-        self.update_UI_select.mainloop()
-
-
-    def view_db(self,event):
-        # redirect to view ui
-        self.view_UI = ViewUI()
-        self.view_UI.wm_title("View entries")
-
-    def __init__(self, *args, **kwargs):
-        tk.Tk.__init__(self,*args,**kwargs)
-
-
+        uiabstract.ParentUI.__init__(self, *args, **kwargs)
         # child UI definitions
         self.update_UI = None
-        self.view_UI = None
 
-       # button definitions
-        self.btn_updateDB = ttk.Button(self,text="Update/add entries")
-        self.btn_viewDB = ttk.Button(self,text="View entries")
 
-        # callback binds
-        self.btn_updateDB.bind("<Button-1>", self.update_db)
-        self.btn_viewDB.bind("<Button-1>", self.view_db)
+        self.mainLabel = ttk.Label(self.container, text="Please select a collection")
 
-        # layout definition
-        self.btn_updateDB.grid(row=0,column=0,columnspan=2)
-        self.btn_viewDB.grid(row=0, column=2,columnspan=2)
+        # button constants
+        self.BTNSUBKEY = 0
+        self.BTNSTAFFKEY = 1
+        self.BTNINVIGILATORKEY = 2
+        self.BTNEXAMHALLKEY = 3
+        self.BTNEXAMKEY = 4
+        self.BTNCLASSKEY = 5
+        self.BTNEXAMINSTANCEKEY = 6
+
+        # buttons
+        self.btn_subject = ttk.Button(self.container, text="Subjects", command=lambda: self.btn_handler(self.BTNSUBKEY))
+        self.btn_staff = ttk.Button(self.container, text="Staffs", command=lambda: self.btn_handler(self.BTNSTAFFKEY))
+        self.btn_invigilator = ttk.Button(self.container, text="Invigilators",
+                                          command=lambda: self.btn_handler(self.BTNINVIGILATORKEY))
+        self.btn_examhall = ttk.Button(self.container, text="Examhalls",
+                                       command=lambda: self.btn_handler(self.BTNEXAMHALLKEY))
+        self.btn_exam = ttk.Button(self.container, text="Exams", command=lambda: self.btn_handler(self.BTNEXAMKEY))
+        self.btn_class = ttk.Button(self.container, text="Classes", command=lambda: self.btn_handler(self.BTNCLASSKEY))
+        self.btn_examinstance = ttk.Button(self.container, text="Exam instances",
+                                           command=lambda: self.btn_handler(self.BTNEXAMINSTANCEKEY))
+
+        # layout
+        self.mainLabel.grid(row=0, columnspan=3)
+        self.btn_subject.grid(row=1)
+        self.btn_staff.grid(row=1, column=1)
+        self.btn_invigilator.grid(row=1, column=2)
+        self.btn_examhall.grid(row=2)
+        self.btn_exam.grid(row=2, column=1)
+        self.btn_class.grid(row=2, column=2)
+        self.btn_examinstance.grid(row=3)
+
+        # padding configuration
+        for child in self.container.winfo_children():
+            child.grid_configure(padx=10, pady=20)
+
+        # click event handlers
+
+    def btn_handler(self, key):
+        if key == self.BTNSUBKEY:
+            self.update_UI = updatesub.UpdateSubjectForm()
+        elif key == self.BTNEXAMINSTANCEKEY:
+            self.update_UI = updateexaminstance.UpdateExaminstanceForm()
+        elif key == self.BTNCLASSKEY:
+            self.update_UI = updateclass.UpdateClassForm()
+        elif key == self.BTNEXAMKEY:
+            self.update_UI = updateexam.UpdateExamForm()
+        elif key == self.BTNEXAMHALLKEY:
+            self.update_UI = updateexamhall.UpdateExamhallForm()
+        elif key == self.BTNINVIGILATORKEY:
+            self.update_UI = updateinv.UpdateInvigilatorForm()
+        elif key == self.BTNSTAFFKEY:
+            self.update_UI = updatestaff.UpdateStaffForm()
+
+
+
 
