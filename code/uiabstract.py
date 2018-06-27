@@ -35,6 +35,9 @@ class ChildUI(tk.Toplevel):
             self.host=None
             self.database=None
 
+    class Fields:
+        pass
+
     def __init__(self, *args, **kwargs):
         tk.Toplevel.__init__(self, *args, **kwargs)
         self.relx = .5
