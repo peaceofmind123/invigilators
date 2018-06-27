@@ -15,11 +15,5 @@ if __name__ == "__main__":
     home_ui.wm_title("Invigilators Database")
     home_ui.mainloop()
 
-    # database connection
-    connection = connector.connect(user='root', host='127.0.0.1', database='invigilators')
-
-    cursor = connection.cursor()
-
-    # execute sql queries on the cursor using cursor.execute(SQL string)
 
 
