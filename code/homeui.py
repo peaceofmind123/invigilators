@@ -58,19 +58,19 @@ class HomeUI(uiabstract.ParentUI):
 
     def btn_handler(self, key):
         if key == self.BTNSUBKEY:
-            self.update_UI = updatesub.UpdateSubjectForm()
+            self.update_UI = updatesub.DisplayUpdateSubjectUI()
         elif key == self.BTNEXAMINSTANCEKEY:
-            self.update_UI = updateexaminstance.UpdateExaminstanceForm()
+            self.update_UI = updateexaminstance.DisplayUpdateExaminstanceUI()
         elif key == self.BTNCLASSKEY:
-            self.update_UI = updateclass.UpdateClassForm()
+            self.update_UI = updateclass.DisplayUpdateClassUI()
         elif key == self.BTNEXAMKEY:
-            self.update_UI = updateexam.UpdateExamForm()
+            self.update_UI = updateexam.DisplayUpdateExamUI()
         elif key == self.BTNEXAMHALLKEY:
-            self.update_UI = updateexamhall.UpdateExamhallForm()
+            self.update_UI = updateexamhall.DisplayUpdateExamhallUI()
         elif key == self.BTNINVIGILATORKEY:
-            self.update_UI = updateinv.UpdateInvigilatorForm()
+            self.update_UI = updateinv.DisplayUpdateInvigilatorUI()
         elif key == self.BTNSTAFFKEY:
-            self.update_UI = updatestaff.UpdateStaffForm()
+            self.update_UI = updatestaff.DisplayUpdateStaffUI()
 
 
 

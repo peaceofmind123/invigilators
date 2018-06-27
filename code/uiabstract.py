@@ -28,13 +28,20 @@ class ParentUI(tk.Tk):
 
 
 class ChildUI(tk.Toplevel):
+    # internal class to hold database metadata
+    class DB:
+        def __init__(self):
+            self.user=None
+            self.host=None
+            self.database=None
+
     def __init__(self, *args, **kwargs):
         tk.Toplevel.__init__(self, *args, **kwargs)
         self.relx = .5
         self.rely = .4
         self.connection = None
         self.cursor = None
-        self.db=None
+        self.db = self.DB()
         self.db.user="root"
         self.db.host="localhost"
         self.db.database="invigilators"
