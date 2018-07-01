@@ -60,11 +60,9 @@ class ChildUI(tk.Toplevel):
         # configuration
         self.resizable(False, False)
         # containers
-        self.outercontainer = tk.Frame(self, width=400, height=400)
-        self.outercontainer.pack(fill="both", expand=True)
-        self.container = tk.Frame(self.outercontainer)
-        self.container.place(in_=self.outercontainer, anchor="c", relx=.5, rely=.4)
-        self.outercontainer.pack_propagate(0)
+        self.container = tk.Frame(self)
+        self.container.pack()
+
 
     def connect_to_db(self,*args,**kwargs):
         if kwargs is not None:
