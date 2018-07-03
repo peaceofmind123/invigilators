@@ -3,6 +3,7 @@ from tkinter import ttk
 import uiabstract
 import math
 import mysql.connector.errors as mysqlerrors
+import mysql
 # the abstract update form class
 class DisplayUpdateUI(uiabstract.ChildUI):
     def __init__(self, *args, **kwargs):
@@ -84,7 +85,7 @@ class DisplayUpdateUI(uiabstract.ChildUI):
             self.btnEdit = ttk.Button(self.container,text="Edit entries",command=self.btnEditHandler)
             self.btnSave = ttk.Button(self.container,text="Save entries",command=self.btnSaveHandler)
             num_of_cols = len(self.fields)
-            self.btnEdit.grid(row=r+1,column = 0,columnspan = math.floor(num_of_cols/2))
+            self.btnEdit.grid(row=r+1,column = 0,columnspan = math.ceil(num_of_cols/2))
             self.btnSave.grid(row=r+1,column = 1,columnspan = num_of_cols-math.floor(num_of_cols/2))
 
     def getRows(self):
@@ -112,7 +113,7 @@ class DisplayUpdateUI(uiabstract.ChildUI):
         # updating the self.fields data structure according to user input
         c=0
         for key, value in self.fields.items():
-            dataCurr = self.dataTextVarMat[c]
+            dataCurr = self.dataEntryMat[c]
             for r in range(len(dataCurr)):
                 value[r] = dataCurr[r].get()
 
@@ -155,12 +156,13 @@ class DisplayUpdateUI(uiabstract.ChildUI):
 
             # try to execute the query, if fails roll it back
             try:
+
                 self.cursor.execute(queryString)
-                self.cursor.execute('COMMIT')
-                print("Update successful")
-            except mysqlerrors.ProgrammingError:
-                self.cursor.execute('COMMIT')
+                self.connection.commit()
+
+            except mysqlerrors.Error:
                 print("Update Failed")
 
-        self.connection.close()
+
+
 

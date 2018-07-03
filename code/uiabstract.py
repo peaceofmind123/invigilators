@@ -76,9 +76,10 @@ class ChildUI(tk.Toplevel):
 
         # database connection
         try:
-            self.connection = connector.connect(user=self.db.user, host=self.db.host, database=self.db.database)
+            self.connection = connector.connect(user=self.db.user, host=self.db.host, database=self.db.database,autocommit=True)
 
             self.cursor = self.connection.cursor()
+
         except connector.errors.DatabaseError:
             print("Database connection could not be established")
             self.master.quit()
