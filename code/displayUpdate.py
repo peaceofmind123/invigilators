@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import ttk
 import uiabstract
 import math
-
+import mysql.connector.errors as mysqlerrors
 # the abstract update form class
 class DisplayUpdateUI(uiabstract.ChildUI):
     def __init__(self, *args, **kwargs):
@@ -11,6 +11,8 @@ class DisplayUpdateUI(uiabstract.ChildUI):
         # data dictionary
         self.fields = {}
 
+        # rows
+        self.rows = []
         # name to identify the table.. since the class is polymorphic
         self.tableName = None
 
@@ -86,8 +88,18 @@ class DisplayUpdateUI(uiabstract.ChildUI):
             self.btnSave.grid(row=r+1,column = 1,columnspan = num_of_cols-math.floor(num_of_cols/2))
 
     def getRows(self):
-        # todo write algorithm to construct a row data structure from current entries
-        pass
+        # input: {key1: [a1,a2,...,aj],key2:[b1,b2,...,bj],...,keyi:[x1,x2...xi],...}
+        # output: rows[[a1,b1...x1..],[a2,b2...x2,...],..,[aj,bj,...xj]...]
+        self.rows=[]
+        i=0
+
+        for key, value in self.fields.items():
+            for j in range(len(value)):
+                if i==0:
+                    self.rows.append([])
+                self.rows[j].append(value[j])
+            i+=1
+        return self.rows
 
     def btnEditHandler(self):
         for i in range(len(self.dataEntryMat)):
@@ -96,15 +108,59 @@ class DisplayUpdateUI(uiabstract.ChildUI):
 
 
     def btnSaveHandler(self):
-        self.cursor.execute("show keys from "+self.tableName+ " where key_name='PRIMARY'")
-        l = self.cursor.fetchall()
-        for row in l:
-            p_col_name=row[4]
 
-        # for key,value in self.fields.items():
-        #     for j in range(len(value)):
-        #         sqlUpdateText = "update " + self.tableName + " set "
-        #         sqlUpdateText += (key+"="+value[j])
-        #
-        #
-        # self.cursor.execute('update '+self.tableName+'set ')
+        # updating the self.fields data structure according to user input
+        c=0
+        for key, value in self.fields.items():
+            dataCurr = self.dataTextVarMat[c]
+            for r in range(len(dataCurr)):
+                value[r] = dataCurr[r].get()
+
+            c += 1
+
+        # flattening the dictionary into rows
+        self.getRows()
+        # getting the names of the primary key fields
+        self.cursor.execute("SHOW KEYS FROM "+self.tableName+" WHERE Key_name = 'PRIMARY'")
+        primary_cols_info = self.cursor.fetchall()
+        primary_cols_names=[] # this array contains the names of the columns of the superkey
+        for entry in primary_cols_info:
+            primary_cols_names.append(entry[4]) # the column name is the fourth entry in the info data
+
+        # the final update query
+        i=0
+        for row in self.rows:
+            queryString = "update " + self.tableName + " set "
+            j=0
+            for key,value in self.fields.items():
+                queryString+=key
+                queryString+="="+row[j]
+
+                # except for the last key=value declaration, append a comma at the end
+                if j!=len(row)-1:
+                    queryString+=", "
+                j += 1
+
+            queryString+=" where "
+            l=0
+            for name in primary_cols_names:
+                queryString += name+"="
+                queryString += self.fields[name][i] # since i is the row number
+                if l!=len(primary_cols_names)-1:
+                    queryString+=", "
+                else:
+                    queryString+=";"
+                l+=1
+            i+=1
+
+            # try to execute the query, if fails roll it back
+            try:
+                self.cursor.execute(queryString)
+                self.cursor.execute('COMMIT')
+                print("Update successful")
+            except mysqlerrors.ProgrammingError:
+                self.cursor.execute('COMMIT')
+                print("Update Failed")
+
+        self.connection.close()
+
