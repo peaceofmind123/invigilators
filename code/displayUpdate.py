@@ -39,9 +39,9 @@ class DisplayUpdateUI(uiabstract.ChildUI):
             self.cursor.execute("select * from " + table)
             for row in self.cursor.fetchall():
                 index = 0
-
+                self.rows.append(list(row))
                 for column in row:
-                    self.fields[column_names[index]].insert(index, row[index])
+                    self.fields[column_names[index]].append(row[index])
                     index += 1
 
             # getting data types
@@ -51,6 +51,20 @@ class DisplayUpdateUI(uiabstract.ChildUI):
             for key,value in self.fields.items():
                 self.dataTypes[key] = datatypes[i][0]
                 i+=1
+
+    def getRows(self):
+        # input: {key1: [a1,a2,...,aj],key2:[b1,b2,...,bj],...,keyi:[x1,x2...xi],...}
+        # output: rows[[a1,b1...x1..],[a2,b2...x2,...],..,[aj,bj,...xj]...]
+        self.rows = []
+        i = 0
+
+        for key, value in self.fields.items():
+            for j in range(len(value)):
+                if i == 0:
+                    self.rows.append([])
+                self.rows[j].append(value[j])
+            i += 1
+        return self.rows
 
     def displayData(self):
         if self.fields is not None:
@@ -101,19 +115,6 @@ class DisplayUpdateUI(uiabstract.ChildUI):
             self.btnEdit.grid(row=finalRowNum+1,column = 0,columnspan = math.ceil(num_of_cols/2))
             self.btnSave.grid(row=finalRowNum+1,column = 1,columnspan = num_of_cols-math.floor(num_of_cols/2))
 
-    def getRows(self):
-        # input: {key1: [a1,a2,...,aj],key2:[b1,b2,...,bj],...,keyi:[x1,x2...xi],...}
-        # output: rows[[a1,b1...x1..],[a2,b2...x2,...],..,[aj,bj,...xj]...]
-        self.rows=[]
-        i=0
-
-        for key, value in self.fields.items():
-            for j in range(len(value)):
-                if i==0:
-                    self.rows.append([])
-                self.rows[j].append(value[j])
-            i+=1
-        return self.rows
 
     def btnEditHandler(self):
         for i in range(len(self.dataEntryMat)):
@@ -147,7 +148,7 @@ class DisplayUpdateUI(uiabstract.ChildUI):
 
             c += 1
 
-        # flattening the dictionary into rows
+        # flattening the data structure into rows
         self.getRows()
 
         # the final update query
@@ -160,7 +161,7 @@ class DisplayUpdateUI(uiabstract.ChildUI):
                 queryString+="="
                 if self.dataTypes[key]=="varchar":
                     queryString+="'"
-                queryString+=row[j]
+                queryString+=str(row[j])
                 if self.dataTypes[key]=="varchar":
                     queryString+="'"
                 # except for the last key=value declaration, append a comma at the end
