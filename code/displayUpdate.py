@@ -201,11 +201,13 @@ class DisplayUpdateUI(uiabstract.ChildUI):
             for key,value in self.fields.items():
                 queryString+=key
                 queryString+="="
-                if self.dataTypes[key]=="varchar":
+                if self.dataTypes[key]=="varchar" or self.dataTypes[key]=="date":
                     queryString+="'"
+
                 queryString+=str(row[j])
-                if self.dataTypes[key]=="varchar":
+                if self.dataTypes[key]=="varchar" or self.dataTypes[key]=="date":
                     queryString+="'"
+
                 # except for the last key=value declaration, append a comma at the end
                 if j!=len(row)-1:
                     queryString+=", "
@@ -215,11 +217,11 @@ class DisplayUpdateUI(uiabstract.ChildUI):
             l=0
             for name in primary_cols_names:
                 queryString += name+"="
-                if self.dataTypes[name] == "varchar":
+                if self.dataTypes[name] == "varchar" or self.dataTypes[name]=="date":
                     queryString += "'"
 
                 queryString += str(primary_key_vals[name][i]) # since i is the row number
-                if self.dataTypes[name] == "varchar":
+                if self.dataTypes[name] == "varchar" or self.dataTypes[name]=="date":
                     queryString += "'"
 
                 if l!=len(primary_cols_names)-1:
@@ -229,9 +231,9 @@ class DisplayUpdateUI(uiabstract.ChildUI):
                 l+=1
             i+=1
             self.btnSave['state']='disabled'
-            for i in range(len(self.dataEntryMat)):
-                for j in range(len(self.dataEntryMat[i])):
-                    (self.dataEntryMat[i][j])['state'] = 'readonly'
+            for k in range(len(self.dataEntryMat)):
+                for l in range(len(self.dataEntryMat[i])):
+                    (self.dataEntryMat[k][l])['state'] = 'readonly'
 
             # try to execute the query, if fails roll it back
             try:
