@@ -117,12 +117,13 @@ class DisplayUpdateUI(uiabstract.ChildUI):
             self.btnEdit.grid(row=self.finalRowNum + 1, column = 0)
             self.btnSave.grid(row=self.finalRowNum + 1, column = 1)
             self.btnAdd.grid(row=self.finalRowNum + 1, column=2)
+            self.btnSave['state'] = 'disabled'
 
     def btnEditHandler(self):
         for i in range(len(self.dataEntryMat)):
             for j in range(len(self.dataEntryMat[i])):
                 (self.dataEntryMat[i][j])['state'] = 'normal'
-
+        self.btnSave['state'] = 'normal'
 
     def btnSaveHandler(self):
         if self.rowsAdded > 0:
@@ -227,6 +228,10 @@ class DisplayUpdateUI(uiabstract.ChildUI):
                     queryString+=";"
                 l+=1
             i+=1
+            self.btnSave['state']='disabled'
+            for i in range(len(self.dataEntryMat)):
+                for j in range(len(self.dataEntryMat[i])):
+                    (self.dataEntryMat[i][j])['state'] = 'readonly'
 
             # try to execute the query, if fails roll it back
             try:
@@ -253,3 +258,5 @@ class DisplayUpdateUI(uiabstract.ChildUI):
                 self.btnSave.grid(row=len(value) + 3, column=1)
                 self.btnAdd.grid(row=len(value) + 3, column=2)
             c += 1
+
+        self.btnSave['state'] = 'normal'
