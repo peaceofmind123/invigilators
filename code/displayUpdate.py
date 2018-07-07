@@ -20,6 +20,7 @@ class DisplayUpdateUI(uiabstract.ChildUI):
         self.dataTypes = {}
         # name to identify the table.. since the class is polymorphic
         self.tableName = None
+        self.rowsAdded = 0
 
     # populates the self.fields object
     def get_data_structure(self, table):
@@ -82,7 +83,8 @@ class DisplayUpdateUI(uiabstract.ChildUI):
             # row and column iterators for column labels
             r = 1
             c = 0
-            finalRowNum=0
+
+            self.finalRowNum =0
             # row iterator inside the loop
 
             # the label of the columns
@@ -105,16 +107,16 @@ class DisplayUpdateUI(uiabstract.ChildUI):
                     entry = tk.Entry(self.container, textvariable=self.dataTextVarMat[c][j],state="readonly")
                     self.dataEntryMat[c].append(entry)
                     self.dataEntryMat[c][j].grid(row=j + 2, column=c)
-                    finalRowNum=j+2 # saving row number for reference in edit and save buttons
-
+                    self.finalRowNum = j + 2
                 # increasing the column number for the next iteration
                 c += 1
             self.btnEdit = ttk.Button(self.container,text="Edit entries",command=self.btnEditHandler)
             self.btnSave = ttk.Button(self.container,text="Save entries",command=self.btnSaveHandler)
+            self.btnAdd = ttk.Button(self.container,text="Add entry",command=self.btnAddHandler)
             num_of_cols = len(self.fields)
-            self.btnEdit.grid(row=finalRowNum+1,column = 0,columnspan = math.ceil(num_of_cols/2))
-            self.btnSave.grid(row=finalRowNum+1,column = 1,columnspan = num_of_cols-math.floor(num_of_cols/2))
-
+            self.btnEdit.grid(row=self.finalRowNum + 1, column = 0)
+            self.btnSave.grid(row=self.finalRowNum + 1, column = 1)
+            self.btnAdd.grid(row=self.finalRowNum + 1, column=2)
 
     def btnEditHandler(self):
         for i in range(len(self.dataEntryMat)):
@@ -123,8 +125,18 @@ class DisplayUpdateUI(uiabstract.ChildUI):
 
 
     def btnSaveHandler(self):
+        if self.rowsAdded > 0:
+            for i in range(self.rowsAdded):
+                c = 0
+                for key, value in self.fields.items():
 
+                    val = self.dataEntryMat[c][len(value)+i].get()
+                    if self.dataTypes[key] == "int": # to be verified
+                        value.append(int(val))
+                    else:
+                        value.append(val)
 
+                    c += 1
         # getting the names of the primary key fields
         self.cursor.execute("SHOW KEYS FROM "+self.tableName+" WHERE Key_name = 'PRIMARY'")
         primary_cols_info = self.cursor.fetchall()
@@ -151,6 +163,35 @@ class DisplayUpdateUI(uiabstract.ChildUI):
         # flattening the data structure into rows
         self.getRows()
 
+        # if rows are added run an add query
+        if self.rowsAdded > 0:
+            for i in range(self.rowsAdded):
+                count=1
+                addQueryString = "insert into "+self.tableName+" ("
+                for key,value in self.fields.items():
+                    addQueryString += key
+                    if (count != len(self.rows[0])):
+                        addQueryString += ", "
+                    else:
+                        addQueryString += ") values ("
+                    count += 1
+
+                count=1
+                for key,value in self.fields.items():
+                    addQueryString+="'"
+                    addQueryString += value[len(value)-i-1] # since the value already contains the values
+                    addQueryString += "'"
+                    if count != len(self.rows[0]):
+                        addQueryString += ", "
+                    else:
+                        addQueryString += ");"
+                    count += 1
+                try:
+                    self.cursor.execute(addQueryString)
+                    self.connection.commit()
+                except mysqlerrors.Error as e:
+                    print(e)
+                    self.connection.rollback()
         # the final update query
         i=0
         for row in self.rows:
@@ -197,6 +238,18 @@ class DisplayUpdateUI(uiabstract.ChildUI):
 
                 print(e)
 
+    def btnAddHandler(self):
+        # the column iterator, again
+        c=0
+        self.rowsAdded += 1
+        for key, value in self.fields.items():
 
+            entry = tk.Entry(self.container)
+            self.dataEntryMat[c].append(entry)
 
-
+            self.dataEntryMat[c][len(value)].grid(row=len(value)+2,column=c)
+            if c == 0:
+                self.btnEdit.grid(row=len(value) + 3, column=0)
+                self.btnSave.grid(row=len(value) + 3, column=1)
+                self.btnAdd.grid(row=len(value) + 3, column=2)
+            c += 1
